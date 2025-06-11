@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import dill
+from sklearn.metrics import r2_score
 
 from src.exception import CustomException
 
@@ -23,3 +24,31 @@ def save_object(file_path, obj):
     except Exception as e:
         print(f"Error saving object: {e}")
         raise e
+    
+def evaluate_models(X_train, y_train, X_test, y_test, models):
+    """
+    Evaluate multiple regression models and return their R2 scores.
+    
+    Parameters:
+    - X_train: Training feature set.
+    - y_train: Training target variable.
+    - X_test: Testing feature set.
+    - y_test: Testing target variable.
+    - models (dict): Dictionary of model names and model instances.
+    
+    Returns:
+    - dict: Model names as keys and their R2 scores as values.
+    """
+    try:
+        report = {}
+        for model_name, model_instance in models.items():
+            model_instance.fit(X_train, y_train)
+            y_train_pred = model_instance.predict(X_train)
+            y_test_pred = model_instance.predict(X_test)
+            train_model_score = r2_score(y_train, y_train_pred)
+            test_model_score = r2_score(y_test, y_test_pred)
+            report[model_name] = test_model_score
+        return report
+    
+    except Exception as e:
+        raise CustomException(e, sys)
