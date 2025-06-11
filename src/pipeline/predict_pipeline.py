@@ -6,22 +6,20 @@ from src.utils import load_object
 
 class PredictPipeline:
     def __init__(self):
-        self.model_path = 'artifacts/model.pkl'
-        self.scaler_path = 'artifacts/scaler.pkl'
-        self.model = load_object(self.model_path)
-        self.scaler = load_object(self.scaler_path)
+        pass
 
     def predict(self, features):
         try:
-            # Convert features to DataFrame
-            data_frame = pd.DataFrame(features, index=[0])
-            # Scale the features
-            scaled_features = self.scaler.transform(data_frame)
-            # Make prediction
-            prediction = self.model.predict(scaled_features)
-            return prediction[0]
+            model_path = 'artifacts/model.pkl'
+            preprocessor_path = 'artifacts/preprocessor.pkl'
+            model=load_object(file_path=model_path)
+            preprocessor=load_object(file_path=preprocessor_path)
+            data_scaled = preprocessor.transform(features)
+            predictions = model.predict(data_scaled)
+            return predictions
         except Exception as e:
             raise CustomException(e, sys)
+
 
 class CustomData:
     def __init__(self, 
@@ -53,5 +51,6 @@ class CustomData:
                 "writing_score": [self.writing_score]
             }
             return pd.DataFrame(custom_data_input_dict)
+        
         except Exception as e:
             raise CustomException(e, sys)
